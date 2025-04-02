@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"   # S3 API port
+      - "9001:9001"   # Web console port
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: supe-r8ec-retp
+    volumes:
+      - /mnt/minio-data:/data        # Data storage
+      - ./config:/root/.minio        # Local config files (can be omitted if not needed)
+    command: server /data --console-address ":9001"
