@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: nextcloud-db
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: stro-ngpa-sswo-rd
+      MYSQL_ROOT_PASSWORD: roo-tpa-ssw-ord
+      TZ: America/Los_Angeles
+    volumes:
+      - type: bind
+        source: /mnt/nextcloud_db
+        target: /var/lib/mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7
+    container_name: nextcloud-redis
+    restart: always
+    command: redis-server --requirepass stro-ngre-dispa-ss
+    environment:
+      TZ: America/Los_Angeles
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  app:
+    image: nextcloud:31
+    container_name: nextcloud-app
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: stro-ngpa-sswo-rd
+      MYSQL_HOST: db
+      REDIS_HOST: redis
+      REDIS_HOST_PASSWORD: stro-ngre-dispa-ss
+      NEXTCLOUD_TRUSTED_DOMAINS: cloud.qizhang.net
+      TZ: America/Los_Angeles
+    volumes:
+      - type: bind
+        source: /mnt/nextcloud_data
+        target: /var/www/html
+    depends_on:
+      - db
+      - redis
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  cron:
+    image: nextcloud:31
+    container_name: nextcloud-cron
+    restart: always
+    entrypoint: /cron.sh
+    environment:
+      TZ: America/Los_Angeles
+    volumes:
+      - type: bind
+        source: /mnt/nextcloud_data
+        target: /var/www/html
+    depends_on:
+      - db
+      - redis
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: eyJhIjoiMmYyOTFiZjk2YmQ1ZWY5ZDA0MGY3MzM4OGMwYzcyZWYiLCJ0IjoiOTZhZjVkNjAtNzY4NC00ZjdiLTkwNmItYWVhZmM0ODVmOTQ4IiwicyI6Ik9Ea3pNbUZrTWpndE56QTFNUzAwTW1OakxUZ3lNbUl0T0dKbE5qTmlPRGM1T1RsaiJ9
+      TZ: America/Los_Angeles
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
