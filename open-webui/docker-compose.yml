@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -7,7 +5,7 @@ services:
     ports:
       - "3000:8080"
     volumes:
-      - open-webui:/app/backend/data
+      - ./open-webui-data:/app/backend/data
     restart: always
     environment:
       TZ: America/Los_Angeles
@@ -16,19 +14,18 @@ services:
       options:
         max-size: "5m"
         max-file: "2"
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: always
-    command: tunnel --no-autoupdate run
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      TUNNEL_TOKEN: eyJhIjoiMmYyOTFiZjk2YmQ1ZWY5ZDA0MGY3MzM4OGMwYzcyZWYiLCJ0IjoiOTZhZjVkNjAtNzY4NC00ZjdiLTkwNmItYWVhZmM0ODVmOTQ4IiwicyI6Ik9Ea3pNbUZrTWpndE56QTFNUzAwTW1OakxUZ3lNbUl0T0dKbE5qTmlPRGM1T1RsaiJ9
-      TZ: America/Los_Angeles
+      - TZ=America/Los_Angeles
     logging:
       driver: "json-file"
       options:
         max-size: "5m"
         max-file: "2"
-
-volumes:
-  open-webui:
+    restart: always

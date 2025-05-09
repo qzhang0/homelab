@@ -1,0 +1,46 @@
+services:
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"   # S3 API port
+      - "9001:9001"   # Web console port
+    environment:
+      TZ: America/Los_Angeles
+    env_file:
+      - /tmp/secret.env
+    volumes:
+      - ./minio-data:/data           # Data storage
+      - ./config:/root/.minio        # Local config files (can be omitted if not needed)
+      - /tmp:/tmp                    # Temporary files
+    command: server /data --console-address ":9001"
+    depends_on:
+      vault-agent:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+  vault-agent:
+    image: hashicorp/vault:1.19.2
+    container_name: vault-agent
+    entrypoint: ["vault", "agent", "-config=/config/vault-agent.hcl"]
+    volumes:
+      - ./vault-config:/config
+      - ./vault-templates:/templates
+      - /tmp:/tmp
+    environment:
+      - VAULT_ADDR=http://10.0.0.24:8200
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "grep MINIO_ROOT_USER /tmp/secret.env && grep MINIO_ROOT_PASSWORD /tmp/secret.env"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"

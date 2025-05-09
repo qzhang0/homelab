@@ -14,7 +14,7 @@ MSI GeForce GTX 1060 6GB GDDR5 PCI Express 3.0 x16 ATX Video Card GTX 1060 GAMIN
 
 ### RAM
 
-CORSAIR VENGEANCE LPX DDR4 RAM 32GB (2x16GB) 3200MHz CL16-20-20-38 1.35V Intel AMD Desktop Computer Memory - Black (CMK32GX4M2E3200C16)
+CORSAIR VENGEANCE LPX DDR4 RAM 64GB (4x16GB) 3200MHz CL16-20-20-38 1.35V Intel AMD Desktop Computer Memory - Black (CMK32GX4M2E3200C16)
 
 ### Motherboard
 
@@ -33,6 +33,8 @@ Samsung 840 Pro 512GB 2.5-Inch SATA 6Gbps Solid State Drive (MZ-7PD512BW)
 #### Hard Drive
 
 Western Digital WD1003FZEX-00K3CA0 Black 1TB 7200RPM SATA 6Gb/s 64MB Cache (RoHS) 3.5-Inch Hard Drive
+
+2 * Seagate IronWolf Pro, 8 TB, Enterprise NAS Internal HDD –CMR 3.5 Inch, SATA 6 Gb/s, 7,200 RPM, 256 MB Cache for RAID Network Attached Storage (ST8000NT001)
 
 #### Power Supply
 

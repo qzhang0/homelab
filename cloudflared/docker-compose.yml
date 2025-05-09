@@ -1,0 +1,40 @@
+# This is a Docker Compose file for running a Cloudflare Tunnel with Vault Agent
+services:
+  vault-agent:
+    image: hashicorp/vault:1.19.2
+    container_name: vault-agent
+    entrypoint: ["vault", "agent", "-config=/config/vault-agent.hcl"]
+    volumes:
+      - ./vault-config:/config
+      - ./vault-templates:/templates
+      - /tmp:/tmp
+    environment:
+      - VAULT_ADDR=http://10.0.0.24:8200
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/secret.env"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: always
+    command: tunnel --no-autoupdate run
+    env_file:
+      - /tmp/secret.env
+    volumes:
+      - /tmp:/tmp
+    depends_on:
+      - vault-agent
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"

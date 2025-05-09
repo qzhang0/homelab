@@ -1,0 +1,80 @@
+networks:
+  gitea-net:
+    driver: bridge
+
+services:
+  gitea:
+    image: docker.gitea.com/gitea:1.23.7
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    env_file:
+      - /tmp/secret.env
+    restart: always
+    networks:
+      - gitea-net
+    volumes:
+      - ./gitea-data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /tmp:/tmp
+    ports:
+      - "3000:3000"
+      - "222:22"
+    depends_on:
+      gitea-db:
+        condition: service_healthy
+      vault-agent:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  gitea-db:
+    image: docker.io/library/mysql:8.4.5
+    container_name: gitea-db
+    env_file:
+      - /tmp/secret.env
+    restart: always
+    networks:
+      - gitea-net
+    volumes:
+      - ./gitea-db:/var/lib/mysql
+      - /tmp:/tmp
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      vault-agent:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  vault-agent:
+    image: hashicorp/vault:1.19.2
+    container_name: vault-agent
+    entrypoint: ["vault", "agent", "-config=/config/vault-agent.hcl"]
+    volumes:
+      - ./vault-config:/config
+      - ./vault-templates:/templates
+      - /tmp:/tmp
+    environment:
+      - VAULT_ADDR=http://10.0.0.24:8200
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "grep MYSQL_ROOT_PASSWORD /tmp/secret.env && grep MYSQL_PASSWORD /tmp/secret.env"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"

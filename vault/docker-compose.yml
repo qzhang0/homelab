@@ -1,0 +1,35 @@
+services:
+  vault:
+    image: hashicorp/vault:1.19.2
+    container_name: vault
+    restart: always
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_LOCAL_CONFIG: |
+        {
+          "ui": true,
+          "listener": [{
+            "tcp": {
+              "address": "0.0.0.0:8200",
+              "tls_disable": 1
+            }
+          }],
+          "storage": {
+            "file": {
+              "path": "/vault/file"
+            }
+          },
+          "disable_mlock": true
+        }
+      TZ: America/Los_Angeles
+    volumes:
+      - ./vault-data:/vault/file
+    command: "server"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
