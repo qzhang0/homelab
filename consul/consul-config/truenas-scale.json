@@ -1,0 +1,16 @@
+{
+    "service": {
+        "name": "truenas-scale",
+        "tags": [
+            "nas",
+            "storage"
+        ],
+        "address": "10.0.0.20",
+        "port": 80,
+        "check": {
+            "http": "http://10.0.0.20",
+            "interval": "30s",
+            "timeout": "3s"
+        }
+    }
+}

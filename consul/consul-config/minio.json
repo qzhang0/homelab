@@ -1,0 +1,15 @@
+{
+    "service": {
+        "name": "minio",
+        "tags": [
+            "storage",
+            "s3"
+        ],
+        "port": 9000,
+        "check": {
+            "http": "http://10.0.0.23:9000/minio/health/live",
+            "interval": "10s",
+            "timeout": "2s"
+        }
+    }
+}

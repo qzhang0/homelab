@@ -1,0 +1,15 @@
+{
+    "service": {
+        "name": "gitea",
+        "tags": [
+            "web",
+            "git"
+        ],
+        "port": 3000,
+        "check": {
+            "http": "http://10.0.0.22:3000",
+            "interval": "10s",
+            "timeout": "1s"
+        }
+    }
+}

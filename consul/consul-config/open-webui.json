@@ -1,0 +1,15 @@
+{
+    "service": {
+        "name": "open-webui",
+        "tags": [
+            "ai",
+            "chatbot"
+        ],
+        "port": 3000,
+        "check": {
+            "http": "http://10.0.0.21:3000",
+            "interval": "10s",
+            "timeout": "2s"
+        }
+    }
+}

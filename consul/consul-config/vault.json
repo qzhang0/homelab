@@ -1,0 +1,16 @@
+{
+    "service": {
+        "name": "vault",
+        "tags": [
+            "secrets",
+            "vault"
+        ],
+        "port": 8200,
+        "check": {
+            "http": "http://10.0.0.24:8200/v1/sys/health",
+            "interval": "10s",
+            "timeout": "1s"
+        }
+    }
+}
+  
